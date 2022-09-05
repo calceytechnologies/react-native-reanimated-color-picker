@@ -1,62 +1,66 @@
-import React from 'react'
-import Animated from 'react-native-reanimated'
+import React from "react";
+import Animated from "react-native-reanimated";
 import {
   TapGestureHandlerGestureEvent,
   PanGestureHandlerGestureEvent,
   TapGestureHandler,
   PanGestureHandler,
-  State as GestureState
-} from 'react-native-gesture-handler'
-import { View, ViewStyle, StyleSheet } from 'react-native'
+  State as GestureState,
+} from "react-native-gesture-handler";
+import { View, ViewStyle, StyleSheet } from "react-native";
 import {
   SrcInComposition,
   SweepGradient,
   ImagePlaceholder,
-  RadialGradient
-} from 'react-native-image-filter-kit'
-import { HueSaturationWheel } from './HueSaturationWheel'
+  RadialGradient,
+} from "react-native-image-filter-kit";
+import { HueSaturationWheel } from "./HueSaturationWheel";
 
-const { call, cond, eq, and, or, set } = Animated
+const { call, cond, eq, and, or, set } = Animated;
 
 type Props = {
-  readonly hue: Animated.Node<number>
-  readonly saturation: Animated.Node<number>
-  readonly value: Animated.Node<number>
-  readonly side: number
-  readonly thumbSize: number
-  readonly translateX: Animated.Node<number>
-  readonly translateY: Animated.Node<number>
-  readonly startX: Animated.Node<number>
-  readonly startY: Animated.Node<number>
-  readonly thumbColor: Animated.Node<string>
-  readonly wheelOpacity: Animated.Node<number>
+  readonly hue: Animated.Node<number>;
+  readonly saturation: Animated.Node<number>;
+  readonly value: Animated.Node<number>;
+  readonly side: number;
+  readonly thumbSize: number;
+  readonly translateX: Animated.Node<number>;
+  readonly translateY: Animated.Node<number>;
+  readonly startX: Animated.Node<number>;
+  readonly startY: Animated.Node<number>;
+  readonly thumbColor: Animated.Node<string>;
+  readonly wheelOpacity: Animated.Node<number>;
   readonly panGestureEvent: (
     event: PanGestureHandlerGestureEvent | TapGestureHandlerGestureEvent
-  ) => void
-  readonly gestureState: Animated.Node<GestureState>
-  readonly valueGestureState: Animated.Node<GestureState>
-  readonly codeKey: number
+  ) => void;
+  readonly gestureState: Animated.Node<GestureState>;
+  readonly valueGestureState: Animated.Node<GestureState>;
+  readonly codeKey: number;
   readonly onColorChangeComplete?: ([
     hue,
     saturation,
-    value
-  ]: readonly number[]) => void
-  readonly onColorChange?: ([hue, saturation, value]: readonly number[]) => void
-}
+    value,
+  ]: readonly number[]) => void;
+  readonly onColorChange?: ([
+    hue,
+    saturation,
+    value,
+  ]: readonly number[]) => void;
+};
 
-type GradientProps = React.ComponentProps<typeof SweepGradient>
+type GradientProps = React.ComponentProps<typeof SweepGradient>;
 
-const colors: GradientProps['colors'] = [
-  '#FF0000',
-  '#FFFF00',
-  '#00FF00',
-  '#00FFFF',
-  '#0000FF',
-  '#FF00FF',
-  '#FF0000'
-]
-const stops: GradientProps['stops'] = [0, 0.165, 0.33, 0.495, 0.66, 0.825, 1]
-const radialColors: GradientProps['colors'] = ['#00000000', '#000000FF']
+const colors: GradientProps["colors"] = [
+  "#FF0000",
+  "#FFFF00",
+  "#00FF00",
+  "#00FFFF",
+  "#0000FF",
+  "#FF00FF",
+  "#FF0000",
+];
+const stops: GradientProps["stops"] = [0, 0.165, 0.33, 0.495, 0.66, 0.825, 1];
+const radialColors: GradientProps["colors"] = ["#00000000", "#000000FF"];
 
 export const Wheel = React.memo((props: Props) => {
   const {
@@ -76,22 +80,30 @@ export const Wheel = React.memo((props: Props) => {
     valueGestureState,
     hue,
     saturation,
-    value
-  } = props
+    value,
+  } = props;
 
-  const thumbOffset = -thumbSize / 2
-  const imageSide = side - thumbSize
-  const containerStyle = { width: side, height: side }
+  const thumbOffset = -thumbSize / 2 + 5;
+  const imageSide = side - thumbSize;
+  const containerStyle = { width: side, height: side };
   const imageStyle = {
     width: imageSide,
     height: imageSide,
-    borderRadius: imageSide / 2
-  }
+    borderRadius: imageSide / 2,
+  };
+  const imageContainerStyle = {
+    width: imageSide + 20,
+    height: imageSide + 20,
+    borderRadius: (imageSide + 20) / 2,
+    borderWidth: 0.3,
+    borderColor: "gray",
+    padding: 10,
+  };
   const thumbStyle = {
     width: thumbSize,
     height: thumbSize,
-    borderRadius: thumbSize / 2
-  }
+    borderRadius: thumbSize / 2,
+  };
 
   return (
     <TapGestureHandler onHandlerStateChange={panGestureEvent}>
@@ -102,7 +114,7 @@ export const Wheel = React.memo((props: Props) => {
           onHandlerStateChange={panGestureEvent}
         >
           <Animated.View style={[styles.container, containerStyle]}>
-            <View style={[styles.wheel, imageStyle]}>
+            <View style={[styles.wheel, imageContainerStyle]}>
               <SrcInComposition
                 srcImage={
                   <SweepGradient
@@ -122,7 +134,7 @@ export const Wheel = React.memo((props: Props) => {
                 style={[
                   imageStyle,
                   styles.wheelOverlay,
-                  { opacity: wheelOpacity }
+                  { opacity: wheelOpacity },
                 ]}
               />
               <Animated.View
@@ -136,9 +148,9 @@ export const Wheel = React.memo((props: Props) => {
                       { translateX },
                       { translateY },
                       { translateX: thumbOffset },
-                      { translateY: thumbOffset }
-                    ]
-                  }
+                      { translateY: thumbOffset },
+                    ],
+                  },
                 ]}
               />
               {onColorChangeComplete !== undefined ? (
@@ -170,7 +182,7 @@ export const Wheel = React.memo((props: Props) => {
                         valueGestureState as Animated.Value<GestureState>,
                         GestureState.UNDETERMINED
                       ),
-                      call([hue, saturation, value], onColorChangeComplete)
+                      call([hue, saturation, value], onColorChangeComplete),
                     ]
                   )}
                 />
@@ -203,33 +215,33 @@ export const Wheel = React.memo((props: Props) => {
         </PanGestureHandler>
       </Animated.View>
     </TapGestureHandler>
-  )
-})
+  );
+});
 
 type Styles = {
-  readonly container: ViewStyle
-  readonly thumb: ViewStyle
-  readonly wheel: ViewStyle
-  readonly wheelOverlay: ViewStyle
-}
+  readonly container: ViewStyle;
+  readonly thumb: ViewStyle;
+  readonly wheel: ViewStyle;
+  readonly wheelOverlay: ViewStyle;
+};
 
 const styles = StyleSheet.create<Styles>({
   container: {
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: "center",
+    alignItems: "center",
   },
   wheel: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'white'
+    width: "100%",
+    height: "100%",
+    backgroundColor: "white",
   },
   wheelOverlay: {
-    position: 'absolute',
-    backgroundColor: 'black'
+    position: "absolute",
+    backgroundColor: "black",
   },
   thumb: {
-    position: 'absolute',
-    borderColor: 'white',
-    borderWidth: 2
-  }
-})
+    position: "absolute",
+    borderColor: "white",
+    borderWidth: 5,
+  },
+});
